@@ -74,6 +74,8 @@ public class SecurePreferences implements SharedPreferences {
 	private static final String PROVIDER = "BC";
 
 	private static SharedPreferences sFile;
+	private static SharedPreferences sKeyFile;
+
 	private static byte[] sKey;
 	private static boolean sLoggingEnabled = false;
     // links user's OnSharedPreferenceChangeListener to secure OnSharedPreferenceChangeListener
@@ -92,14 +94,15 @@ public class SecurePreferences implements SharedPreferences {
 		if (SecurePreferences.sFile == null) {
 			SecurePreferences.sFile = PreferenceManager
 					.getDefaultSharedPreferences(context);
+			SecurePreferences.sKeyFile = context.getSharedPreferences(context.getPackageName()+"_key",0);
 		}
 		// Initialize encryption/decryption key
 		try {
 			final String key = SecurePreferences.generateAesKeyName(context);
-			String value = SecurePreferences.sFile.getString(key, null);
+			String value = SecurePreferences.sKeyFile.getString(key, null);
 			if (value == null) {
 				value = SecurePreferences.generateAesKeyValue();
-				SecurePreferences.sFile.edit().putString(key, value).commit();
+				SecurePreferences.sKeyFile.edit().putString(key, value).commit();
 			}
 			SecurePreferences.sKey = SecurePreferences.decode(value);
 		} catch (Exception e) {
